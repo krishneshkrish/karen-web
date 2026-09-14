@@ -1,0 +1,21 @@
+# Dependencies
+node_modules/
+package-lock.json.bak
+
+# SvelteKit build & temporary output
+.svelte-kit/
+build/
+dist/
+
+# Environment configurations
+.env
+.env.*
+!.env.example
+
+# Test execution temporary artifacts
+testsprite_tests/tmp/
+*.log
+
+# OS generated files
+.DS_Store
+Thumbs.db

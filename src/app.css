@@ -1,0 +1,116 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --bg-emotion-neutral: #0d0d1a;
+    --bg-emotion-anxiety: #2a1a0a;
+    --bg-emotion-sadness: #0a1020;
+    --bg-emotion-calm: #0a1a15;
+  }
+
+  body {
+    background-color: var(--bg-emotion-neutral);
+    transition: background-color 5s ease-in-out;
+  }
+}
+
+/* Ambient gradient layer background */
+.ambient-bg {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  transition: background 5s ease-in-out, opacity 5s ease-in-out;
+}
+
+.ambient-neutral {
+  background: radial-gradient(circle at 50% 35%, rgba(139, 92, 246, 0.18) 0%, rgba(13, 13, 26, 0.95) 75%);
+}
+
+.ambient-anxiety {
+  background: radial-gradient(circle at 50% 35%, rgba(245, 158, 11, 0.22) 0%, rgba(42, 26, 10, 0.95) 75%);
+}
+
+.ambient-sadness {
+  background: radial-gradient(circle at 50% 35%, rgba(59, 130, 246, 0.2) 0%, rgba(10, 16, 32, 0.95) 75%);
+}
+
+.ambient-calm {
+  background: radial-gradient(circle at 50% 35%, rgba(20, 184, 166, 0.22) 0%, rgba(10, 26, 21, 0.95) 75%);
+}
+
+/* Glowing Orb core identity */
+.karen-orb {
+  border-radius: 50%;
+  position: relative;
+  transition: background 3s ease, box-shadow 3s ease;
+}
+
+.orb-neutral {
+  background: radial-gradient(circle, #a78bfa 0%, #7c3aed 50%, #4c1d95 100%);
+  box-shadow: 0 0 60px 20px rgba(139, 92, 246, 0.4), inset 0 0 20px rgba(255, 255, 255, 0.6);
+}
+
+.orb-anxiety {
+  background: radial-gradient(circle, #fde047 0%, #f59e0b 50%, #b45309 100%);
+  box-shadow: 0 0 60px 20px rgba(245, 158, 11, 0.45), inset 0 0 20px rgba(255, 255, 255, 0.7);
+}
+
+.orb-sadness {
+  background: radial-gradient(circle, #93c5fd 0%, #3b82f6 50%, #1e3a8a 100%);
+  box-shadow: 0 0 60px 20px rgba(59, 130, 246, 0.4), inset 0 0 20px rgba(255, 255, 255, 0.6);
+}
+
+.orb-calm {
+  background: radial-gradient(circle, #6ee7b7 0%, #14b8a6 50%, #064e3b 100%);
+  box-shadow: 0 0 60px 20px rgba(20, 184, 166, 0.45), inset 0 0 20px rgba(255, 255, 255, 0.7);
+}
+
+/* Page slide/drift transition utility */
+.screen-fade-drift {
+  animation: fadeDrift 450ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes fadeDrift {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Glassmorphism card helpers */
+.glass-card {
+  background: rgba(255, 255, 255, 0.04);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.glass-input {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.glass-input:focus-within {
+  border-color: rgba(167, 139, 250, 0.5);
+  box-shadow: 0 0 20px rgba(139, 92, 246, 0.2);
+}
+
+/* Custom scrollbars */
+::-webkit-scrollbar {
+  width: 4px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 4px;
+}
