@@ -31,16 +31,27 @@
 	let textareaRef: HTMLTextAreaElement | null = $state(null);
 
 	// Emotion backgrounds
+	let currentSeverity = $state<string>('low');
+
+	// Dynamic Emotion & Severity Atmospheric Palettes (Supports all 7 DistilRoBERTa classes + Crisis/Distress)
 	const emotionBackgrounds: Record<string, string> = {
-		neutral: '#0d0d1a',
-		sadness: 'linear-gradient(135deg, #0a1020 0%, #0d0d1a 100%)',
-		fear: 'linear-gradient(135deg, #1a1008 0%, #0d0d1a 100%)',
-		anger: 'linear-gradient(135deg, #1a0808 0%, #0d0d1a 100%)',
-		joy: 'linear-gradient(135deg, #081a10 0%, #0d0d1a 100%)'
+		neutral: 'radial-gradient(ellipse at 50% 25%, rgba(45, 30, 80, 0.4) 0%, #0d0d1a 80%)',
+		sadness: 'radial-gradient(ellipse at 50% 25%, rgba(18, 48, 95, 0.45) 0%, #0d0d1a 80%)',
+		fear: 'radial-gradient(ellipse at 50% 25%, rgba(75, 45, 12, 0.45) 0%, #0d0d1a 80%)',
+		anger: 'radial-gradient(ellipse at 50% 25%, rgba(85, 18, 24, 0.45) 0%, #0d0d1a 80%)',
+		joy: 'radial-gradient(ellipse at 50% 25%, rgba(15, 70, 38, 0.45) 0%, #0d0d1a 80%)',
+		surprise: 'radial-gradient(ellipse at 50% 25%, rgba(70, 20, 90, 0.45) 0%, #0d0d1a 80%)',
+		disgust: 'radial-gradient(ellipse at 50% 25%, rgba(60, 52, 14, 0.45) 0%, #0d0d1a 80%)',
+		crisis: 'radial-gradient(ellipse at 50% 25%, rgba(110, 15, 25, 0.65) 0%, #0d0d1a 80%)',
+		high: 'radial-gradient(ellipse at 50% 25%, rgba(85, 30, 20, 0.5) 0%, #0d0d1a 80%)'
 	};
 
 	let bgStyle = $derived(
-		emotionBackgrounds[dominantEmotion] || emotionBackgrounds.neutral
+		currentSeverity === 'crisis'
+			? emotionBackgrounds.crisis
+			: (currentSeverity === 'high'
+				? (emotionBackgrounds[dominantEmotion] || emotionBackgrounds.high)
+				: (emotionBackgrounds[dominantEmotion] || emotionBackgrounds.neutral))
 	);
 
 	// IndexedDB helper
@@ -201,6 +212,8 @@
 			const detectedEmotion = data.detected_emotion || data.ml_signals?.dominant_emotion || 'neutral';
 			const isCrisis = data.crisis_flag || data.crisis === true;
 			const isEscalate = data.escalate === true;
+			const detectedSeverity = (data.ml_signals?.severity || (isCrisis ? 'crisis' : isEscalate ? 'high' : 'low')).toLowerCase();
+			currentSeverity = detectedSeverity;
 
 			const karenMsg: Message = {
 				id: crypto.randomUUID(),
