@@ -128,6 +128,11 @@
 	}
 
 	onMount(() => {
+		const token = typeof window !== 'undefined' ? localStorage.getItem('karen_jwt_token') : null;
+		if (!token) {
+			goto('/auth');
+			return;
+		}
 		loadHistorySessions();
 	});
 </script>

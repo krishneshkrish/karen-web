@@ -197,7 +197,7 @@
 			}
 
 			const data = await res.json();
-			const replyContent = data.reply || "I'm right here with you. Take your time.";
+			const replyContent = data.reply || data.response || "I'm right here with you. Take your time.";
 			const detectedEmotion = data.detected_emotion || data.ml_signals?.dominant_emotion || 'neutral';
 			const isCrisis = data.crisis_flag || data.crisis === true;
 			const isEscalate = data.escalate === true;
@@ -237,11 +237,27 @@
 		}
 	}
 
+	function handleSignOut() {
+		if (typeof window !== 'undefined') {
+			localStorage.removeItem('karen_jwt_token');
+			localStorage.removeItem('karen_user_hash');
+			sessionStorage.removeItem('karen_session_id');
+		}
+		isDrawerOpen = false;
+		goto('/auth');
+	}
+
 	function toggleTimestamp(id: string) {
 		messages = messages.map((m) => (m.id === id ? { ...m, showTime: !m.showTime } : m));
 	}
 
 	onMount(() => {
+		const token = typeof window !== 'undefined' ? localStorage.getItem('karen_jwt_token') : null;
+		if (!token) {
+			goto('/auth');
+			return;
+		}
+
 		let sid = sessionStorage.getItem('karen_session_id');
 		if (!sid) {
 			sid = crypto.randomUUID();

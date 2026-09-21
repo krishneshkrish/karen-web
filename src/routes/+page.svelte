@@ -4,6 +4,7 @@
 
 	let mounted = $state(false);
 	let timeGreeting = $state('');
+	let isLoggedIn = $state(false);
 
 	function updateGreeting() {
 		const hour = new Date().getHours();
@@ -20,6 +21,8 @@
 
 	onMount(() => {
 		updateGreeting();
+		const token = typeof window !== 'undefined' ? localStorage.getItem('karen_jwt_token') : null;
+		isLoggedIn = !!token;
 		// Trigger staggered fade-in animations after mount
 		requestAnimationFrame(() => {
 			mounted = true;
@@ -27,7 +30,12 @@
 	});
 
 	function handleBegin() {
-		goto('/enter');
+		const token = typeof window !== 'undefined' ? localStorage.getItem('karen_jwt_token') : null;
+		if (token) {
+			goto('/enter');
+		} else {
+			goto('/auth');
+		}
 	}
 </script>
 
@@ -41,15 +49,35 @@
 		<div class="h-96 w-96 rounded-full bg-purple-900/10 blur-[100px]"></div>
 	</div>
 
-	<!-- Top Ambient Time-based Greeting -->
+	<!-- Top Ambient Time-based Greeting & Auth State -->
 	<header
-		class="z-10 text-center text-xs tracking-[0.25em] text-purple-200/60 uppercase transition-all duration-1000 delay-300"
+		class="z-10 w-full flex items-center justify-between px-2 text-xs tracking-[0.25em] text-purple-200/60 uppercase transition-all duration-1000 delay-300"
 		class:translate-y-2={!mounted}
 		class:opacity-0={!mounted}
 		class:translate-y-0={mounted}
 		class:opacity-100={mounted}
 	>
-		{timeGreeting}
+		<span class="w-16"></span>
+		<span class="text-center">{timeGreeting}</span>
+		<div class="w-16 flex justify-end">
+			{#if isLoggedIn}
+				<button
+					type="button"
+					onclick={() => goto('/enter')}
+					class="text-[11px] lowercase tracking-wider text-purple-300/70 hover:text-white transition-colors cursor-pointer"
+				>
+					enter
+				</button>
+			{:else}
+				<button
+					type="button"
+					onclick={() => goto('/auth')}
+					class="text-[11px] lowercase tracking-wider text-purple-300/70 hover:text-white transition-colors cursor-pointer"
+				>
+					sign in
+				</button>
+			{/if}
+		</div>
 	</header>
 
 	<!-- Center Content Area -->
@@ -96,9 +124,9 @@
 		>
 			<button
 				onclick={handleBegin}
-				class="group relative inline-flex items-center justify-center rounded-full bg-purple-950/40 px-8 py-3.5 text-sm font-medium tracking-wider text-purple-100/90 ring-1 ring-purple-400/30 transition-all duration-300 hover:bg-purple-900/40 hover:text-white hover:ring-purple-400/60 hover:shadow-[0_0_25px_rgba(168,85,247,0.3)] active:scale-95"
+				class="group relative inline-flex items-center justify-center rounded-full bg-purple-950/40 px-8 py-3.5 text-sm font-medium tracking-wider text-purple-100/90 ring-1 ring-purple-400/30 transition-all duration-300 hover:bg-purple-900/40 hover:text-white hover:ring-purple-400/60 hover:shadow-[0_0_25px_rgba(168,85,247,0.3)] active:scale-95 cursor-pointer"
 			>
-				Begin when ready
+				{isLoggedIn ? 'Continue when ready' : 'Begin when ready'}
 			</button>
 		</div>
 	</main>

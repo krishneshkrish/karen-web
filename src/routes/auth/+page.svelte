@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { onMount } from 'svelte';
 	import { goto } from '$app/navigation';
 	import { env } from '$env/dynamic/public';
 
@@ -10,6 +11,13 @@
 	let confirmPassword = $state('');
 	let loading = $state(false);
 	let error = $state('');
+
+	onMount(() => {
+		const token = typeof window !== 'undefined' ? localStorage.getItem('karen_jwt_token') : null;
+		if (token) {
+			goto('/enter');
+		}
+	});
 
 	function switchTab(newMode: 'login' | 'register') {
 		if (mode !== newMode) {
@@ -53,7 +61,7 @@
 
 			if (!res.ok) {
 				if (res.status === 409) {
-					error = 'An account with this email already exists.';
+					error = 'An account with this email already exists. Try signing in.';
 				} else if (res.status === 401) {
 					error = 'Incorrect email or password.';
 				} else {
@@ -71,7 +79,6 @@
 
 			goto('/enter');
 		} catch (err) {
-			// Soft network error fallback for offline/demo environment
 			error = 'Unable to reach authentication server. Please check your connection.';
 			loading = false;
 		}
@@ -86,21 +93,40 @@
 		<div class="h-80 w-80 rounded-full bg-purple-950/20 blur-[100px]"></div>
 	</div>
 
-	<!-- Top Dimmed 60px Orb -->
-	<header class="z-10 pt-4 flex flex-col items-center">
-		<div class="relative flex items-center justify-center">
-			<div class="orb-dimmed"></div>
-		</div>
+	<!-- Top Navigation Bar -->
+	<header class="z-10 w-full max-w-[390px] pt-2 flex items-center justify-between">
+		<button
+			type="button"
+			onclick={() => goto('/')}
+			class="text-xs tracking-wider text-purple-300/60 hover:text-white transition-colors cursor-pointer flex items-center gap-1.5"
+		>
+			<span>←</span>
+			<span>back</span>
+		</button>
+		<div class="orb-dimmed"></div>
+		<div class="w-12"></div>
 	</header>
 
 	<!-- Auth Form Container -->
 	<main class="z-10 my-auto w-full max-w-[390px] px-2">
+		<div class="text-center mb-6">
+			<h2 class="font-serif text-2xl font-extralight text-purple-100 tracking-wide">
+				{mode === 'login' ? 'Welcome back' : 'Create your space'}
+			</h2>
+			<p class="text-xs text-purple-300/50 mt-1 font-light">
+				{mode === 'login' ? 'Sign in to access your conversations' : 'Your private sanctuary to reflect and talk'}
+			</p>
+		</div>
+
 		<!-- Tabs Header -->
 		<div class="mb-8 flex justify-center space-x-8 border-b border-purple-500/10 pb-2">
 			<button
 				type="button"
 				onclick={() => switchTab('login')}
-				class="relative pb-2 text-sm font-medium tracking-wider transition-colors duration-300 ${mode === 'login' ? 'text-purple-100' : 'text-purple-300/40 hover:text-purple-200/70'}"
+				class="relative pb-2 text-sm font-medium tracking-wider transition-colors duration-300 cursor-pointer"
+				class:text-purple-100={mode === 'login'}
+				class:text-purple-300={mode !== 'login'}
+				class:opacity-50={mode !== 'login'}
 			>
 				Sign in
 				{#if mode === 'login'}
@@ -111,7 +137,10 @@
 			<button
 				type="button"
 				onclick={() => switchTab('register')}
-				class="relative pb-2 text-sm font-medium tracking-wider transition-colors duration-300 ${mode === 'register' ? 'text-purple-100' : 'text-purple-300/40 hover:text-purple-200/70'}"
+				class="relative pb-2 text-sm font-medium tracking-wider transition-colors duration-300 cursor-pointer"
+				class:text-purple-100={mode === 'register'}
+				class:text-purple-300={mode !== 'register'}
+				class:opacity-50={mode !== 'register'}
 			>
 				Create account
 				{#if mode === 'register'}
@@ -169,7 +198,7 @@
 				</div>
 			{/if}
 
-			<!-- Soft Error State -->
+			<!-- Error State -->
 			{#if error}
 				<div class="pt-1 text-xs text-rose-300/90 font-light tracking-wide text-center">
 					{error}
@@ -181,12 +210,12 @@
 				<button
 					type="submit"
 					disabled={loading}
-					class="w-full group relative inline-flex items-center justify-center rounded-full bg-purple-950/40 px-8 py-3.5 text-sm font-medium tracking-wider text-purple-100/90 ring-1 ring-purple-400/30 transition-all duration-300 hover:bg-purple-900/40 hover:text-white hover:ring-purple-400/60 hover:shadow-[0_0_25px_rgba(168,85,247,0.3)] active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
+					class="w-full group relative inline-flex items-center justify-center rounded-full bg-purple-950/40 px-8 py-3.5 text-sm font-medium tracking-wider text-purple-100/90 ring-1 ring-purple-400/30 transition-all duration-300 hover:bg-purple-900/40 hover:text-white hover:ring-purple-400/60 hover:shadow-[0_0_25px_rgba(168,85,247,0.3)] active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
 				>
 					{#if loading}
 						<span class="animate-pulse">Connecting...</span>
 					{:else}
-						<span>{mode === 'register' ? 'Create space' : 'Begin'}</span>
+						<span>{mode === 'register' ? 'Create space' : 'Sign in'}</span>
 					{/if}
 				</button>
 			</div>
@@ -195,14 +224,14 @@
 
 	<!-- Footer Note -->
 	<footer class="z-10 pb-2 text-center text-xs font-light tracking-wide text-purple-200/40">
-		Your conversations stay on this device.
+		Your conversations stay private and secure.
 	</footer>
 </div>
 
 <style>
 	.orb-dimmed {
-		width: 60px;
-		height: 60px;
+		width: 44px;
+		height: 44px;
 		border-radius: 50%;
 		background: transparent;
 		border: 1.5px solid rgba(180, 160, 255, 0.25);
